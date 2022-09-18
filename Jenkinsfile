@@ -16,90 +16,141 @@ env.NO = "no"
 env.I_YES = "!yes"
 env.I_NO = "!no"
 
-env.ALWAYS_TRUE = '!true'
-env.ALWAYS_FALSE = '!false'
 
-env.PARAM_IS_TRUE_BUT_ENV_IS_FALSE = 'false'
-env.PARAM_IS_FALSE_BUT_ENV_IS_TRUE = 'true'
-
-env.ENV_IS_IFALSE_BUT_PARAM_IS_TRUE = '!false'
-env.ENV_IS_ITRUE_BUT_PARAM_IS_FALSE = '!true'
-
-env.ENV_IS_PRESENT = "ENV_IS_PRESENT"
-//env.ENV_IS_NOT_PRESENT = "ENV_IS_NOT_PRESENT"
-
-env.ENV_IS_SET_PARAM_IS_EMPTY = 'ENV_IS_SET_PARAM_IS_EMPTY'
-env.PARAM_IS_SET_ENV_IS_EMPTY = ''
-
-env.FOO = "foo"
-env.BAR = "bar"
-
-node('CTS_NGC_SLAVE') {
+node() {
 
     properties( [
             parameters( [
-                    booleanParam( name: "I_TRUE", defaultValue: false, description: "NOT environemment." ),
-                    booleanParam( name: "I_FALSE", defaultValue: true, description: "NOT environment." ),
-                    booleanParam( name: "TRUE", defaultValue: true, description: "NOT environment." ),
-
-                    booleanParam( name: "PARAM_IS_TRUE_BUT_ENV_IS_FALSE", defaultValue: true, description: "TRUE" ),
-                    booleanParam( name: "PARAM_IS_FALSE_BUT_ENV_IS_TRUE", defaultValue: false, description: "FALSE" ),
-                    booleanParam( name: "ENV_IS_IFALSE_BUT_PARAM_IS_TRUE", defaultValue: true, description: "TRUE" ),
-                    booleanParam( name: "ENV_IS_ITRUE_BUT_PARAM_IS_FALSE", defaultValue: false, description: "FALSE" ),
-
-                    string( name: "FOO", defaultValue: "", description: "Initial value: foo" ),
-                    string( name: "BAR", defaultValue: "", description: "Initial value: bar"),
-
-                    string( name: 'ENV_IS_SET_PARAM_IS_EMPTY', defaultValue: '', description: 'Environment defines a value, but param does not.' ),
-                    string( name: 'PARAM_IS_SET_ENV_IS_EMPTY', defaultValue: 'PARAM_IS_SET_ENV_IS_EMPTY', description: 'Parameter defines a value, but env does not.' ),
-
-                    string( name: "TEST_STRING", defaultValue: "test_string", trim: true, description: "Sample string parameter" ),
-                    text( name: "TEST_TEXT", defaultValue: "Jenkins Pipeline Tutorial", description: "Sample multi-line text parameter" ),
-                    // password( name: "TEST_PASSWORD", defaultValueAsSecret: "SECRET", description: "Sample password parameter" ),
-                    choice( name: "TEST_CHOICE", choices: ["production", "staging", "development"], description: "Sample multi-choice parameter" )
+                    booleanParam( name: "I_TRUE", defaultValue: false, description: "important environemment." ),
+                    booleanParam( name: "I_FALSE", defaultValue: true, description: "important environment." ),
             ] )
     ] )
 
-    stage("Setup") {
+    // Reused variables:
+    int pauses = 0
+    int tries = 0
+
+    stage( "Setup" ) {
 
         echo "Environment variables:"
-        echo "PARAM_IS_TRUE_BUT_ENV_IS_FALSE:  env == ${env.PARAM_IS_TRUE_BUT_ENV_IS_FALSE}"
-        echo "PARAM_IS_FALSE_BUT_ENV_IS_TRUE:  env == ${env.PARAM_IS_FALSE_BUT_ENV_IS_TRUE}"
-        echo "ENV_IS_IFALSE_BUT_PARAM_IS_TRUE: env == ${env.ENV_IS_IFALSE_BUT_PARAM_IS_TRUE}"
-        echo "ENV_IS_ITRUE_BUT_PARAM_IS_FALSE: env == ${env.ENV_IS_ITRUE_BUT_PARAM_IS_FALSE}"
-        echo "ENV_IS_SET_PARAM_IS_EMPTY:       env == ${env.ENV_IS_SET_PARAM_IS_EMPTY}"
-        echo "PARAM_IS_SET_ENV_IS_EMPTY:       env == ${PARAM_IS_SET_ENV_IS_EMPTY}"
         echo ""
 
         echo "Parameter variables:"
-        echo "PARAM_IS_TRUE_BUT_ENV_IS_FALSE:  param == ${params.PARAM_IS_TRUE_BUT_ENV_IS_FALSE}"
-        echo "PARAM_IS_FALSE_BUT_ENV_IS_TRUE:  param == ${params.PARAM_IS_FALSE_BUT_ENV_IS_TRUE}"
-        echo "ENV_IS_IFALSE_BUT_PARAM_IS_TRUE: param == ${params.ENV_IS_IFALSE_BUT_PARAM_IS_TRUE}"
-        echo "ENV_IS_ITRUE_BUT_PARAM_IS_FALSE: param == ${params.ENV_IS_ITRUE_BUT_PARAM_IS_FALSE}"
-        echo "ENV_IS_SET_PARAM_IS_EMPTY:       param == ${params.ENV_IS_SET_PARAM_IS_EMPTY}"
-        echo "PARAM_IS_SET_ENV_IS_EMPTY:       param == ${params.PARAM_IS_SET_ENV_IS_EMPTY}"
-
         echo ""
 
     }
 
-    stage("getParam() Boolean") {
+    stage( "bad args tests" ) {
 
-        echo "Using getParam()"
-        echo "PARAM_IS_TRUE_BUT_ENV_IS_FALSE:  getParam() == ${getParam('PARAM_IS_TRUE_BUT_ENV_IS_FALSE')}"
-        echo "PARAM_IS_FALSE_BUT_ENV_IS_TRUE:  getParam() == ${getParam('PARAM_IS_FALSE_BUT_ENV_IS_TRUE')}"
-        echo "ENV_IS_IFALSE_BUT_PARAM_IS_TRUE: getParam() == ${getParam('ENV_IS_IFALSE_BUT_PARAM_IS_TRUE')}"
-        echo "ENV_IS_ITRUE_BUT_PARAM_IS_FALSE: getParam() == ${getParam('ENV_IS_ITRUE_BUT_PARAM_IS_FALSE')}"
+        echo "No parameters specified."
+        try {
+            retryUntil( )
+        } catch ( Exception e ) {
+            echo "Exception thrown:"
+            echo "${e.message}"
+        }
+
+        echo "Neither maxTries or maxTime not specified."
+        try {
+            retryUntil( task: { 0 } )
+        } catch ( Exception e ) {
+            echo "Exception thrown:"
+            echo "${e.message}"
+        }
 
     }
 
-    stage("getParam() Present") {
-        echo ""
-        echo "PARAM_NOT_PRESENT:               getParam() == ${getParam('PARAM_NOT_PRESENT')}"
-        echo "ENV_IS_PRESENT:                  getParam() == ${getParam('ENV_IS_PRESENT')}"
-        echo "ENV_IS_NOT_PRESENT:              getParam() == ${getParam('ENV_IS_NOT_PRESENT')}"
-        echo "ENV_IS_SET_PARAM_IS_EMPTY:       getParam() == ${getParam('ENV_IS_SET_PARAM_IS_EMPTY')}"
-        echo "PARAM_IS_SET_ENV_IS_EMPTY:       getParam() == ${getParam('PARAM_IS_SET_ENV_IS_EMPTY')}"
+    stage( "maxTries 3 .. 1" ) {
+
+        echo "Can try 3 times..."
+        def times = 3
+        retryUntil( maxTries: 3, task: { --times } )
+
+        echo "Can try 2 times..."
+        times = 2
+        retryUntil( maxTries: 2, task: { --times } )
+
+        echo "Can try 1 times..."
+        times = 1
+        retryUntil( maxTries: 1, task: { --times } )
+
+    }
+
+    stage( "maxTime" ) {
+
+        echo "maxTime (10S) reached before success..."
+        try {
+            retryUntil( maxTime: "PT10S", pauseFor: "PT2S", task: {
+                // echo "Test: maxTime reached before success..."
+                1
+            } )
+        } catch ( Exception ex ) {
+            if ( ex.message == "No success after waiting PT10S time." ) {
+                echo "${ex.message}"
+                echo "Test: SUCCESS."
+            } else {
+                throw ex
+            }
+        }
+
+        echo "maxTime (10S) NOT reached before success..."
+        pauses = 0
+        retryUntil( maxTime: "PT10S", pauseFor: "PT2S", task: {
+            pauses++
+            /// echo "Test: maxTime NOT reached before success ${pauses}."
+            if ( pauses > 5 ) {
+                echo "Test: SUCCESS."
+                0
+            } else {
+                1
+            }
+        } )
+
+        echo "maxTime (10S) reached before maxTries (11)..."
+        tries = 0
+        try {
+            // Times out in 10s, but will try 11 times, pausing 1s each try.
+            retryUntil( maxTime: "PT10S", maxTries: 11, pauseFor: "PT1S", task: {
+                tries++
+                // echo "Iteration: ${pauses}."
+                if ( tries > 11 ) {
+                    echo "Test: FAILURE."
+                    0
+                } else {
+                    1
+                }
+            } )
+        } catch ( Exception ex ) {
+            if ( ex.message == "No success after waiting PT10S time." ) {
+                echo "${ex.message}"
+                echo "Test: SUCCESS."
+            } else {
+                throw ex
+            }
+        }
+
+        echo "maxRetries (10) reached before maxTime (12S)..."
+        tries = 0
+        try {
+            retryUntil( maxTime: "PT12S", maxTries: 10, pauseFor: "PT1S", task: {
+                tries++
+                // echo "Iteration: ${pauses}."
+                if ( tries == 10 ) {
+                    echo "Test: SUCCESS."
+                    0
+                } else {
+                    1
+                }
+            } )
+        } catch ( Exception ex ) {
+            if ( ex.message == "No success after waiting PT12S time." ) {
+                echo "${ex.message}"
+                echo "Test: FAILURE."
+            } else {
+                throw ex
+            }
+        }
+
     }
 
 }
