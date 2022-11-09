@@ -75,4 +75,13 @@ node() {
         log.debug( "debug message." )
     }
 
+    stage( "By Method OFF" ) {
+        log.setLevel(OFF)
+        log.fatal( "fatal message." )
+        log.error( "error message." )
+        log.warn( "warn message." )
+        log.info( "info message" )
+        log.debug( "debug message." )
+    }
+
 }
